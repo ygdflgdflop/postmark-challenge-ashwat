@@ -1,0 +1,133 @@
+<!doctype html>
+<head>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <script>
+        function getResponse() {
+            document.getElementById("generated_response").style.display = "block";
+            document.getElementById("reply").style.display = "block";
+            document.getElementById("generator").style.display = "none";
+        };
+    </script>
+
+    <div class="m-6">
+        <a href="javascript:history.back()" 
+           class="inline-flex items-center px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors">
+            <span class="text-xl mr-2">🔙</span>
+            <span class="font-medium">Back</span>
+        </a>
+    </div>
+
+    <div class="mx-auto max-w-4xl my-8 px-6">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-6">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                {% if email.subject|length > 0 %}
+                    <h1 class="text-xl font-semibold text-gray-900">{{ email.subject }}</h1>
+                {% else %}
+                    <h1 class="text-xl font-semibold text-gray-400 italic">No subject</h1>
+                {% endif %}
+            </div>
+            
+            <div class="px-6 py-4 space-y-3">
+                <div class="flex items-center">
+                    <span class="text-sm font-medium text-gray-500 w-16">From:</span>
+                    <span class="text-sm text-gray-900 font-medium">{{ email.sender }}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium text-gray-500 w-8">CC:</span>
+                        <span class="text-sm text-gray-700">{{ email.cc|default:"—" }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium text-gray-500 w-12">BCC:</span>
+                        <span class="text-sm text-gray-700">{{ email.bcc|default:"—" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-6 py-6 border-t border-gray-200">
+                <div class="prose prose-sm max-w-none">
+                    <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{{ email.body }}</p>
+                </div>
+            </div>
+            
+            <div class="px-6 py-3 border-t border-gray-200 bg-gray-50">
+                <p class="text-sm text-gray-500 text-right">{{ email.date }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Sentiment Analysis</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-green-700">Positive</span>
+                        <span class="text-sm text-green-600">{% widthratio email.positive 1 100 %}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="h-3 bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-500" 
+                             style="width: {% widthratio email.positive 1 100 %}%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-blue-700">Neutral</span>
+                        <span class="text-sm text-blue-600">{% widthratio email.neutral 1 100 %}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500" 
+                             style="width: {% widthratio email.neutral 1 100 %}%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-red-700">Negative</span>
+                        <span class="text-sm text-red-600">{% widthratio email.negative 1 100 %}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full transition-all duration-500" 
+                             style="width: {% widthratio email.negative 1 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <p class="text-center text-gray-700">
+                    This email has an overall 
+                    <span class="font-semibold text-gray-900">{{ sentiment }}</span> 
+                    sentiment.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+            <div class="text-center">
+                <button id="generator" 
+                        class="inline-flex items-center px-6 py-3 text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm transition-all duration-200 shadow-sm hover:shadow-md" 
+                        onclick="getResponse()">
+                    <span class="mr-2">✨</span>
+                    Generate a matching response
+                </button>
+                
+                <div id="generated_response" 
+                     class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-left" 
+                     style="display: none;">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2">Generated Response:</h3>
+                    <div class="text-gray-800 leading-relaxed whitespace-pre-wrap">{{ response }}</div>
+                </div>
+                
+                <a id="reply" 
+                   class="inline-flex items-center mt-4 px-6 py-3 text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm transition-all duration-200 shadow-sm hover:shadow-md" 
+                   href="mailto:{{ email.sender }}?body={{ response }}" 
+                   style="display: none;">
+                    <span class="mr-2">📧</span>
+                    Draft response
+                </a>
+            </div>
+        </div>
+    </div>
+</body>

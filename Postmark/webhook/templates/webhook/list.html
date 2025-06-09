@@ -1,0 +1,109 @@
+<!doctype html>
+<head>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="mx-80 my-20 p-6">
+        <div class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-blue-800">
+                Send your emails to 
+                <a href="mailto:bbfb7aa2d0c8df387ac4e55a9d2724fc@inbound.postmarkapp.com" 
+                   class="text-blue-600 underline hover:text-blue-800">
+                    bbfb7aa2d0c8df387ac4e55a9d2724fc@inbound.postmarkapp.com
+                </a>
+            </p>
+        </div>
+
+        {% if page %}
+            <div class="space-y-3 mb-8">
+                {% for email in page %}
+                    {% if email.positive > email.neutral and email.positive > email.negative %}
+                        <div class="border border-green-200 bg-green-50 rounded-lg p-4 hover:bg-green-100 transition-colors">
+                            <a href="/{{ email.hash }}" class="block">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-green-800 mb-1">{{ email.sender }}</div>
+                                        <div class="text-green-700 text-sm line-clamp-2">{{ email.body }}</div>
+                                    </div>
+                                    <div class="text-green-600 text-sm ml-4 flex-shrink-0">{{ email.date }}</div>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Positive
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    {% elif email.negative > email.positive and email.negative > email.neutral %}
+                        <div class="border border-red-200 bg-red-50 rounded-lg p-4 hover:bg-red-100 transition-colors">
+                            <a href="/{{ email.hash }}" class="block">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-red-800 mb-1">{{ email.sender }}</div>
+                                        <div class="text-red-700 text-sm line-clamp-2">{{ email.body }}</div>
+                                    </div>
+                                    <div class="text-red-600 text-sm ml-4 flex-shrink-0">{{ email.date }}</div>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Negative
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="border border-gray-200 bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <a href="/{{ email.hash }}" class="block">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-gray-800 mb-1">{{ email.sender }}</div>
+                                        <div class="text-gray-700 text-sm line-clamp-2">{{ email.body }}</div>
+                                    </div>
+                                    <div class="text-gray-600 text-sm ml-4 flex-shrink-0">{{ email.date }}</div>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        Neutral
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="flex justify-center items-center space-x-4 mt-8">
+                {% if page.has_previous %}
+                    <a href="?pg=1" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                        &laquo; First
+                    </a>
+                    <a href="?pg={{ page.previous_page_number }}" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                        Previous
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md">
+                    Page {{ page.number }} of {{ page.paginator.num_pages }}
+                </span>
+
+                {% if page.has_next %}
+                    <a href="?pg={{ page.next_page_number }}" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                        Next
+                    </a>
+                    <a href="?pg={{ page.paginator.num_pages }}" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                        Last &raquo;
+                    </a>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-lg mb-4">📧</div>
+                <p class="text-gray-500 text-lg">No mail for you</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
